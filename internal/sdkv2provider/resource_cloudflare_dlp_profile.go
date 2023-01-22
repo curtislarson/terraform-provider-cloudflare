@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cloudflare/cloudflare-go"
 	"github.com/cloudflare/terraform-provider-cloudflare/internal/consts"
+	"github.com/curtislarson/cloudflare-go"
 
 	"github.com/MakeNowJust/heredoc/v2"
 	"github.com/hashicorp/terraform-plugin-log/tflog"

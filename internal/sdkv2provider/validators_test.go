@@ -3,7 +3,7 @@ package sdkv2provider
 import (
 	"testing"
 
-	cloudflare "github.com/cloudflare/cloudflare-go"
+	cloudflare "github.com/curtislarson/cloudflare-go"
 )
 
 func TestValidateRecordType(t *testing.T) {

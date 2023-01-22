@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cloudflare/cloudflare-go"
+	"github.com/curtislarson/cloudflare-go"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )

@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cloudflare/cloudflare-go"
+	"github.com/curtislarson/cloudflare-go"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
@@ -128,7 +128,7 @@ func main() {
 
 	if err != nil {
 		log.Fatalf("failed to comment on pull request %s/%s#%d: %s", owner, repo, prNo, err)
-	}	
+	}
 
 	os.Exit(1)
 }

@@ -5,7 +5,6 @@ go 1.19
 require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
-	github.com/cloudflare/cloudflare-go v0.59.0
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
@@ -44,6 +43,7 @@ require (
 
 require (
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
+	github.com/curtislarson/cloudflare-go v0.0.0-20230122195703-c7fc7532d163 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect

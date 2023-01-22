@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	cloudflare "github.com/cloudflare/cloudflare-go"
+	cloudflare "github.com/curtislarson/cloudflare-go"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"

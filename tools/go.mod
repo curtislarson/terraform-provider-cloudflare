@@ -5,7 +5,6 @@ go 1.19
 require (
 	github.com/bflad/tfproviderlint v0.28.1
 	github.com/client9/misspell v0.3.4
-	github.com/cloudflare/cloudflare-go v0.49.0
 	github.com/cweill/gotests v1.6.0
 	github.com/go-delve/delve v1.9.1
 	github.com/golangci/golangci-lint v1.49.0
