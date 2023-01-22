@@ -28,6 +28,58 @@ func resourceCloudflareTunnelConfig() *schema.Resource {
 	}
 }
 
+func readOriginRequestFieldsIntoConfig(originRequest map[string]interface{}, originConfig *cloudflare.OriginRequestConfig) {
+	if v, ok := originRequest["connect_timeout"]; ok {
+		timeout, _ := time.ParseDuration(v.(string))
+		originConfig.ConnectTimeout = &timeout
+	}
+	if v, ok := originRequest["tls_timeout"]; ok {
+		timeout, _ := time.ParseDuration(v.(string))
+		originConfig.TLSTimeout = &timeout
+	}
+	if v, ok := originRequest["tcp_keep_alive"]; ok {
+		timeout, _ := time.ParseDuration(v.(string))
+		originConfig.TCPKeepAlive = &timeout
+	}
+	if v, ok := originRequest["no_happy_eyeballs"]; ok {
+		originConfig.NoHappyEyeballs = cloudflare.BoolPtr(v.(bool))
+	}
+	if v, ok := originRequest["keep_alive_connections"]; ok {
+		originConfig.KeepAliveConnections = cloudflare.IntPtr(v.(int))
+	}
+	if v, ok := originRequest["keep_alive_timeout"]; ok {
+		timeout, _ := time.ParseDuration(v.(string))
+		originConfig.KeepAliveTimeout = &timeout
+	}
+	if v, ok := originRequest["http_host_header"]; ok {
+		originConfig.HTTPHostHeader = cloudflare.StringPtr(v.(string))
+	}
+	if v, ok := originRequest["origin_server_name"]; ok {
+		originConfig.OriginServerName = cloudflare.StringPtr(v.(string))
+	}
+	if v, ok := originRequest["ca_pool"]; ok {
+		originConfig.CAPool = cloudflare.StringPtr(v.(string))
+	}
+	if v, ok := originRequest["no_tls_verify"]; ok {
+		originConfig.NoTLSVerify = cloudflare.BoolPtr(v.(bool))
+	}
+	if v, ok := originRequest["disable_chunked_encoding"]; ok {
+		originConfig.DisableChunkedEncoding = cloudflare.BoolPtr(v.(bool))
+	}
+	if v, ok := originRequest["bastion_mode"]; ok {
+		originConfig.BastionMode = cloudflare.BoolPtr(v.(bool))
+	}
+	if v, ok := originRequest["proxy_address"]; ok {
+		originConfig.ProxyAddress = cloudflare.StringPtr(v.(string))
+	}
+	if v, ok := originRequest["proxy_port"]; ok {
+		originConfig.ProxyPort = cloudflare.UintPtr(uint(v.(int)))
+	}
+	if v, ok := originRequest["proxy_type"]; ok {
+		originConfig.ProxyType = cloudflare.StringPtr(v.(string))
+	}
+}
+
 func buildTunnelConfig(d *schema.ResourceData) cloudflare.TunnelConfiguration {
 	warpRouting := cloudflare.WarpRoutingConfig{}
 	if item, ok := d.GetOk("config.0.warp_routing.0"); ok {
@@ -39,55 +91,7 @@ func buildTunnelConfig(d *schema.ResourceData) cloudflare.TunnelConfiguration {
 	originConfig := cloudflare.OriginRequestConfig{}
 	if item, ok := d.GetOk("config.0.origin_request.0"); ok {
 		originRequest := item.(map[string]interface{})
-		if v, ok := originRequest["connect_timeout"]; ok {
-			timeout, _ := time.ParseDuration(v.(string))
-			originConfig.ConnectTimeout = &timeout
-		}
-		if v, ok := originRequest["tls_timeout"]; ok {
-			timeout, _ := time.ParseDuration(v.(string))
-			originConfig.TLSTimeout = &timeout
-		}
-		if v, ok := originRequest["tcp_keep_alive"]; ok {
-			timeout, _ := time.ParseDuration(v.(string))
-			originConfig.TCPKeepAlive = &timeout
-		}
-		if v, ok := originRequest["no_happy_eyeballs"]; ok {
-			originConfig.NoHappyEyeballs = cloudflare.BoolPtr(v.(bool))
-		}
-		if v, ok := originRequest["keep_alive_connections"]; ok {
-			originConfig.KeepAliveConnections = cloudflare.IntPtr(v.(int))
-		}
-		if v, ok := originRequest["keep_alive_timeout"]; ok {
-			timeout, _ := time.ParseDuration(v.(string))
-			originConfig.KeepAliveTimeout = &timeout
-		}
-		if v, ok := originRequest["http_host_header"]; ok {
-			originConfig.HTTPHostHeader = cloudflare.StringPtr(v.(string))
-		}
-		if v, ok := originRequest["origin_server_name"]; ok {
-			originConfig.OriginServerName = cloudflare.StringPtr(v.(string))
-		}
-		if v, ok := originRequest["ca_pool"]; ok {
-			originConfig.CAPool = cloudflare.StringPtr(v.(string))
-		}
-		if v, ok := originRequest["no_tls_verify"]; ok {
-			originConfig.NoTLSVerify = cloudflare.BoolPtr(v.(bool))
-		}
-		if v, ok := originRequest["disable_chunked_encoding"]; ok {
-			originConfig.DisableChunkedEncoding = cloudflare.BoolPtr(v.(bool))
-		}
-		if v, ok := originRequest["bastion_mode"]; ok {
-			originConfig.BastionMode = cloudflare.BoolPtr(v.(bool))
-		}
-		if v, ok := originRequest["proxy_address"]; ok {
-			originConfig.ProxyAddress = cloudflare.StringPtr(v.(string))
-		}
-		if v, ok := originRequest["proxy_port"]; ok {
-			originConfig.ProxyPort = cloudflare.UintPtr(uint(v.(int)))
-		}
-		if v, ok := originRequest["proxy_type"]; ok {
-			originConfig.ProxyType = cloudflare.StringPtr(v.(string))
-		}
+		readOriginRequestFieldsIntoConfig(originRequest, &originConfig)
 
 		var ipRules []cloudflare.IngressIPRule
 		if v, ok := originRequest["ip_rules"]; ok {
@@ -113,6 +117,11 @@ func buildTunnelConfig(d *schema.ResourceData) cloudflare.TunnelConfiguration {
 			Service:  ingressRuleConfig["service"].(string),
 			Hostname: ingressRuleConfig["hostname"].(string),
 			Path:     ingressRuleConfig["path"].(string),
+		}
+		if ingressRuleOriginRequest, ok := ingressRuleConfig["origin_request"]; ok {
+			ingressRuleOriginRequestConfig := cloudflare.OriginRequestConfig{}
+			readOriginRequestFieldsIntoConfig(ingressRuleOriginRequest.(map[string]interface{}), &ingressRuleOriginRequestConfig)
+			ingressRule.OriginRequest = &ingressRuleOriginRequestConfig
 		}
 		ingressRules = append(ingressRules, ingressRule)
 	}
@@ -180,9 +189,10 @@ func resourceCloudflareTunnelConfigRead(ctx context.Context, d *schema.ResourceD
 	var ingressRules []map[string]interface{}
 	for _, ingressRule := range config.Ingress {
 		ingressRules = append(ingressRules, map[string]interface{}{
-			"service":  ingressRule.Service,
-			"hostname": ingressRule.Hostname,
-			"path":     ingressRule.Path,
+			"service":        ingressRule.Service,
+			"hostname":       ingressRule.Hostname,
+			"path":           ingressRule.Path,
+			"origin_request": ingressRule.OriginRequest,
 		})
 	}
 	configMap = append(configMap, map[string]interface{}{

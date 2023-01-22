@@ -51,6 +51,9 @@ func testTunnelConfig(resourceID, accountID, tunnelSecret string) string {
 			  hostname = "foo"
 			  path = "/bar"
 			  service = "http://10.0.0.2:8080"
+				origin_request {
+					origin_server_name = "foo"
+				}
 			}
 			ingress_rule {
 				service = "https://10.0.0.3:8081"
@@ -124,6 +127,7 @@ func TestAccCloudflareTunnelConfig_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(name, "config.0.ingress_rule.0.hostname", "foo"),
 					resource.TestCheckResourceAttr(name, "config.0.ingress_rule.0.path", "/bar"),
 					resource.TestCheckResourceAttr(name, "config.0.ingress_rule.0.service", "http://10.0.0.2:8080"),
+					resource.TestCheckResourceAttr(name, "config.0.ingress_rule.0.origin_request.0.origin_server_name", "foo"),
 					resource.TestCheckResourceAttr(name, "config.0.ingress_rule.1.hostname", ""),
 					resource.TestCheckResourceAttr(name, "config.0.ingress_rule.1.path", ""),
 					resource.TestCheckResourceAttr(name, "config.0.ingress_rule.1.service", "https://10.0.0.3:8081"),
